@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="MD.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDSA - Linked List Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .code-output {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            max-height: 200px;
+            border: 1px solid #ddd;
+        }
+
+        pre code {
+            font-family: "Courier New", Courier, monospace;
+            color: #333;
+        }
+
+        .algorithm {
+            margin-top: 20px;
+            text-align: left;
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+            position: absolute;
+            bottom: 10px;
+        }
+
+        .emoji {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MyDSA - Linked List Generator 🌟</h1>
+        
+        <div class="form-group">
+            <label>Select Linked List Type:</label>
+            <select id="listType">
+                <option value="singly">Singly Linked List</option>
+                <option value="doubly">Doubly Linked List</option>
+                <option value="circular">Circular Linked List</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Enter node values (comma separated):</label>
+            <input type="text" id="nodeValues" placeholder="e.g. 1, 2, 3, 4" required>
+        </div>
+
+        <button id="generateCode">Generate Code 🚀</button>
+
+        <div class="code-output">
+            <h3>Generated C Code:</h3>
+            <pre id="codeBlock"></pre>
+        </div>
+
+        <div class="algorithm">
+            <h3>Algorithm:</h3>
+            <pre id="algorithmBlock"></pre>
+        </div>
+    </div>
+
+    <footer>
+        <p>Developed with ❤️ by <b><a href="https://linktr.ee/manash.djmm" target="_blank" style="text-decoration: none;">Manash</a></b> | MyDSA |</p>
+    </footer>
+
+    <script>
+        document.getElementById('generateCode').addEventListener('click', function () {
+            const listType = document.getElementById('listType').value;
+            const nodeValues = document.getElementById('nodeValues').value.trim();
+
+            // Validate node values input
+            if (!nodeValues) {
+                alert('Please enter node values.');
+                return;
+            }
+
+            const values = nodeValues.split(',').map(item => item.trim());
+            const codeBlock = document.getElementById('codeBlock');
+            const algorithmBlock = document.getElementById('algorithmBlock');
+
+            let generatedCode = '';
+            let algorithm = '';
+
+            if (listType === 'singly') {
+                generatedCode = generateSinglyLinkedListCode(values);
+                algorithm = generateSinglyLinkedListAlgorithm();
+            } else if (listType === 'doubly') {
+                generatedCode = generateDoublyLinkedListCode(values);
+                algorithm = generateDoublyLinkedListAlgorithm();
+            } else if (listType === 'circular') {
+                generatedCode = generateCircularLinkedListCode(values);
+                algorithm = generateCircularLinkedListAlgorithm();
+            }
+
+            codeBlock.textContent = generatedCode;
+            algorithmBlock.textContent = algorithm;
+        });
+
+        function generateSinglyLinkedListCode(values) {
+            return `
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+void insert(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = (*head_ref);
+    (*head_ref) = new_node;
+}
+
+void printList(struct Node *node) {
+    while (node != NULL) {
+        printf("%d -> ", node->data);
+        node = node->next;
+    }
+    printf("NULL\\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    
+    // Insert values
+    ${values.map(value => `insert(&head, ${value});`).join('\n    ')}
+
+    printList(head);
+
+    return 0;
+}`;
+        }
+
+        function generateDoublyLinkedListCode(values) {
+            return `
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+void insert(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = (*head_ref);
+    new_node->prev = NULL;
+    
+    if ((*head_ref) != NULL)
+        (*head_ref)->prev = new_node;
+    
+    (*head_ref) = new_node;
+}
+
+void printList(struct Node* node) {
+    printf("Traversal in forward direction:\\n");
+    while (node != NULL) {
+        printf("%d -> ", node->data);
+        node = node->next;
+    }
+    printf("NULL\\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    
+    // Insert values
+    ${values.map(value => `insert(&head, ${value});`).join('\n    ')}
+
+    printList(head);
+
+    return 0;
+}`;
+        }
+
+        function generateCircularLinkedListCode(values) {
+            return `
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+void insert(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
+    struct Node* last = *head_ref;
+    new_node->data = new_data;
+    new_node->next = *head_ref;
+
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        new_node->next = *head_ref;
+    } else {
+        while (last->next != *head_ref)
+            last = last->next;
+        last->next = new_node;
+    }
+}
+
+void printList(struct Node* head) {
+    struct Node* temp = head;
+    if (head != NULL) {
+        do {
+            printf("%d -> ", temp->data);
+            temp = temp->next;
+        } while (temp != head);
+    }
+    printf("\\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    
+    // Insert values
+    ${values.map(value => `insert(&head, ${value});`).join('\n    ')}
+
+    printList(head);
+
+    return 0;
+}`;
+        }
+
+        function generateSinglyLinkedListAlgorithm() {
+            return `
+1. Define Node structure.
+2. Create insert function:
+   - Allocate memory for new node.
+   - Update next pointer.
+3. Create print function to display list.
+4. In main:
+   - Initialize head.
+   - Insert values.
+   - Print list.`;
+        }
+
+        function generateDoublyLinkedListAlgorithm() {
+            return `
+1. Define Node structure.
+2. Create insert function:
+   - Allocate memory for new node.
+   - Update next and prev pointers.
+3. Create print function to display list.
+4. In main:
+   - Initialize head.
+   - Insert values.
+   - Print list.`;
+        }
+
+        function generateCircularLinkedListAlgorithm() {
+            return `
+1. Define Node structure.
+2. Create insert function:
+   - Allocate memory for new node.
+   - Update pointers for head and last node.
+3. Create print function to display list.
+4. In main:
+   - Initialize head.
+   - Insert values.
+   - Print list.`;
+        }
+    </script>
+</body>
+</html>
